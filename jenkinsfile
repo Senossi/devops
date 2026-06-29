@@ -1,0 +1,68 @@
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+
+            steps {
+
+                git url: 'https://github.com/Senossi/devops.git', branch: 'main'
+
+            }
+
+        }
+
+        stage('Build Maven') {
+
+            steps {
+
+                sh 'mvn clean package -DskipTests'
+
+            }
+
+        }
+
+        stage('Build Docker Image') {
+
+            steps {
+
+                sh 'docker build -t spring-app:latest .'
+
+            }
+
+        }
+
+        stage('Run Containers') {
+
+            steps {
+
+                sh 'docker compose down || true'
+
+                sh 'docker compose up -d --build'
+
+            }
+
+        }
+
+    }
+
+    post {
+
+        success {
+
+            echo 'Pipeline Success 🚀'
+
+        }
+
+        failure {
+
+            echo 'Pipeline Failed ❌'
+
+        }
+
+    }
+
+}
+ 
